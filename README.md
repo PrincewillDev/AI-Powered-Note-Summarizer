@@ -8,7 +8,7 @@ A modern, full-stack web application that transforms lengthy text into concise, 
 - ⚡ **Lightning Fast** - Optimized performance with intelligent fallback systems
 - 🎨 **Beautiful UI** - Modern, responsive design built with React and Tailwind CSS
 - 🔒 **Secure & Simple** - No authentication required, no data persistence
-- 🌐 **Production Ready** - Deployed on Railway (backend) and Vercel (frontend)
+- 🌐 **Production Ready** - Deployed on Render (backend) and Vercel (frontend)
 - 📱 **Mobile Friendly** - Works perfectly on all devices
 
 ## 🏗️ Architecture
@@ -18,7 +18,7 @@ A modern, full-stack web application that transforms lengthy text into concise, 
 │                 │ ────────────────→ │                 │
 │  Frontend       │                   │  Backend        │
 │  React + Vite   │ ←──────────────── │  FastAPI        │
-│  (Vercel)       │                   │  (Railway)      │
+│  (Vercel)       │                   │  (Render)       │
 └─────────────────┘                   └─────────────────┘
                                               │
                                               │ API Calls
@@ -71,7 +71,7 @@ npm run dev
 - **Python 3.12+** - Latest Python features
 - **Groq API** - Advanced AI language model integration
 - **Uvicorn** - Lightning-fast ASGI server
-- **Railway** - Cloud deployment platform
+- **Render** - Cloud deployment platform
 
 ### Frontend
 - **React 18** - Modern React with hooks
@@ -94,8 +94,8 @@ AI-Powered-Note-Summarizer/
 │   │   ├── main.py            # FastAPI application
 │   │   └── __init__.py
 │   ├── requirements.txt       # Python dependencies
-│   ├── Procfile              # Railway deployment
-│   ├── railway.json          # Railway configuration
+│   ├── Procfile              # Render deployment
+│   ├── railway.json          # Legacy Railway configuration
 │   ├── run_simple.py         # Local development server
 │   └── .env.example          # Environment variables template
 ├── frontend/                  # React frontend
@@ -126,10 +126,10 @@ AI-Powered-Note-Summarizer/
 
 ```bash
 # Health check
-curl https://your-api.railway.app/health
+curl https://your-api.onrender.com/health
 
 # Summarize text
-curl -X POST https://your-api.railway.app/summarize \
+curl -X POST https://your-api.onrender.com/summarize \
   -H "Content-Type: application/json" \
   -d '{
     "text": "Your long text content here..."
@@ -141,14 +141,14 @@ curl -X POST https://your-api.railway.app/summarize \
 ### Quick Deploy
 
 1. **Fork this repository**
-2. **Deploy backend to Railway**:
+2. **Deploy backend to Render**:
    - Connect GitHub repository
    - Set `GROQ_API_KEY` environment variable
    - Auto-deploy from `backend/` folder
 
 3. **Deploy frontend to Vercel**:
    - Connect GitHub repository
-   - Set `VITE_API_URL` to your Railway URL
+   - Set `VITE_API_URL` to your Render URL
    - Auto-deploy from `frontend/` folder
 
 ### Detailed Instructions
@@ -156,18 +156,18 @@ See [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md) for complete step-by-step instr
 
 ## 🔑 Environment Variables
 
-### Backend (Railway)
+### Backend (Render)
 ```bash
 GROQ_API_KEY=your_groq_api_key_here   # Required: Get from groq.com
 DEBUG=False                           # Production mode
-HOST=0.0.0.0                         # Listen on all interfaces  
-PORT=8000                            # Server port
+ENVIRONMENT=production               # Environment flag
+PYTHON_VERSION=3.12.0               # Python version
 ALLOWED_ORIGINS=*                    # CORS origins
 ```
 
 ### Frontend (Vercel)
 ```bash
-VITE_API_URL=https://your-backend-url  # Your Railway backend URL
+VITE_API_URL=https://your-backend-url  # Your Render backend URL
 ```
 
 ## 🤝 Contributing

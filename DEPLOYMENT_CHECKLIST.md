@@ -6,43 +6,48 @@ Use this checklist to deploy your AI-Powered Note Summarizer to production.
 
 ### Prerequisites
 - [ ] GitHub account with repository pushed
-- [ ] Railway account created ([railway.app](https://railway.app))
+- [ ] Render account created ([render.com](https://render.com))
 - [ ] Vercel account created ([vercel.com](https://vercel.com))
 - [ ] Groq API key obtained ([console.groq.com](https://console.groq.com/keys))
 
-## 🖥️ Backend Deployment (Railway)
+## 🖥️ Backend Deployment (Render)
 
 ### Repository Setup
 - [ ] Code is pushed to GitHub
 - [ ] `backend/` folder contains all necessary files:
   - [ ] `app/main.py` - FastAPI application
   - [ ] `requirements.txt` - Python dependencies
-  - [ ] `Procfile` - Railway start command
-  - [ ] `railway.json` - Railway configuration
+  - [ ] `Procfile` - Render deployment command
+  - [ ] `railway.json` - Legacy configuration (not needed for Render)
   - [ ] `.env.example` - Environment template
 
-### Railway Deployment
-- [ ] Created new Railway project
+### Render Deployment
+- [ ] Created new Web Service on Render
 - [ ] Connected GitHub repository
-- [ ] Selected backend folder as root directory
+- [ ] Service configuration set:
+  - [ ] Name: `ai-note-summarizer-backend`
+  - [ ] Root Directory: `backend`
+  - [ ] Build Command: `pip install -r requirements.txt`
+  - [ ] Start Command: `gunicorn app.main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT`
 - [ ] Set environment variables:
   - [ ] `GROQ_API_KEY=your_actual_key`
   - [ ] `DEBUG=False`
-  - [ ] `HOST=0.0.0.0`
-  - [ ] `PORT=8000`
+  - [ ] `ENVIRONMENT=production`
+  - [ ] `PYTHON_VERSION=3.12.0`
   - [ ] `ALLOWED_ORIGINS=*`
 - [ ] Deployment completed successfully
-- [ ] Railway URL obtained: `https://[your-app].up.railway.app`
+- [ ] Render URL obtained: `https://[your-service].onrender.com`
 
 ### Backend Testing
-- [ ] Health check works: `curl https://[your-app].up.railway.app/health`
+- [ ] Health check works: `curl https://[your-service].onrender.com/health`
 - [ ] Summarization works: 
   ```bash
-  curl -X POST https://[your-app].up.railway.app/summarize \
+  curl -X POST https://[your-service].onrender.com/summarize \
     -H "Content-Type: application/json" \
     -d '{"text": "Test text to summarize"}'
   ```
-- [ ] No errors in Railway logs
+- [ ] No errors in Render service logs
+- [ ] **Note**: First request after inactivity may take 30-60 seconds (Render free tier)
 
 ## 🌐 Frontend Deployment (Vercel)
 
@@ -62,7 +67,7 @@ Use this checklist to deploy your AI-Powered Note Summarizer to production.
   - [ ] Build Command: `npm run build`
   - [ ] Output Directory: `dist`
 - [ ] Set environment variables:
-  - [ ] `VITE_API_URL=https://[your-railway-app].up.railway.app`
+  - [ ] `VITE_API_URL=https://[your-render-service].onrender.com`
 - [ ] Deployment completed successfully
 - [ ] Vercel URL obtained: `https://[your-app].vercel.app`
 
@@ -78,7 +83,7 @@ Use this checklist to deploy your AI-Powered Note Summarizer to production.
 ## 🔗 Integration & Final Steps
 
 ### Backend CORS Update
-- [ ] Updated Railway environment variables:
+- [ ] Updated Render environment variables:
   - [ ] `FRONTEND_URL=https://[your-vercel-app].vercel.app`
   - [ ] `ALLOWED_ORIGINS=https://[your-vercel-app].vercel.app,http://localhost:5173`
 - [ ] Backend redeployed automatically
@@ -97,8 +102,8 @@ Use this checklist to deploy your AI-Powered Note Summarizer to production.
 - [ ] Updated README.md with live URLs
 - [ ] Shared project URLs:
   - Frontend: `https://[your-app].vercel.app`
-  - Backend: `https://[your-app].up.railway.app`
-  - API Docs: `https://[your-app].up.railway.app/docs`
+  - Backend: `https://[your-service].onrender.com`
+  - API Docs: `https://[your-service].onrender.com/docs`
 
 ## 🎯 Production URLs
 
@@ -107,33 +112,34 @@ After successful deployment, fill in your actual URLs:
 | Service | URL | Status |
 |---------|-----|--------|
 | **Frontend** | `https://____________.vercel.app` | [ ] Working |
-| **Backend** | `https://____________.up.railway.app` | [ ] Working |
-| **Health Check** | `https://____________.up.railway.app/health` | [ ] Working |
-| **API Docs** | `https://____________.up.railway.app/docs` | [ ] Working |
+| **Backend** | `https://____________.onrender.com` | [ ] Working |
+| **Health Check** | `https://____________.onrender.com/health` | [ ] Working |
+| **API Docs** | `https://____________.onrender.com/docs` | [ ] Working |
 
 ## 🔧 Environment Variables Used
 
-### Railway (Backend)
+### Render (Backend)
 ```bash
 GROQ_API_KEY=gsk_...
 DEBUG=False
-HOST=0.0.0.0
-PORT=8000
+ENVIRONMENT=production
+PYTHON_VERSION=3.12.0
 ALLOWED_ORIGINS=https://your-frontend-url.vercel.app,http://localhost:5173
 FRONTEND_URL=https://your-frontend-url.vercel.app
 ```
 
 ### Vercel (Frontend)
 ```bash
-VITE_API_URL=https://your-backend-url.up.railway.app
+VITE_API_URL=https://your-backend-service.onrender.com
 ```
 
 ## 🚨 Common Issues & Solutions
 
 ### Backend Issues
 - [ ] **Build fails**: Check `requirements.txt` has all dependencies
-- [ ] **Runtime error**: Check Railway logs, verify environment variables
+- [ ] **Runtime error**: Check Render service logs, verify environment variables
 - [ ] **API timeout**: Check Groq API key is valid and has credits
+- [ ] **Cold start delay**: First request after inactivity may take 30-60 seconds (free tier)
 
 ### Frontend Issues
 - [ ] **Build fails**: Check TypeScript errors, verify all imports

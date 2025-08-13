@@ -2,12 +2,12 @@
 
 ## AI-Powered Note Summarizer - Full Stack Deployment
 
-This guide covers deploying both backend (Railway) and frontend (Vercel) for the AI-Powered Note Summarizer.
+This guide covers deploying both backend (Render) and frontend (Vercel) for the AI-Powered Note Summarizer.
 
 ## 📋 Prerequisites
 
 - ✅ GitHub account with your code pushed
-- ✅ Railway account ([railway.app](https://railway.app))
+- ✅ Render account ([render.com](https://render.com))
 - ✅ Vercel account ([vercel.com](https://vercel.com))
 - ✅ Groq API key ([console.groq.com](https://console.groq.com/keys))
 
@@ -17,7 +17,7 @@ This guide covers deploying both backend (Railway) and frontend (Vercel) for the
 ┌─────────────────┐    HTTP/HTTPS     ┌─────────────────┐
 │                 │ ────────────────→ │                 │
 │  Frontend       │                   │  Backend        │
-│  (Vercel)       │ ←──────────────── │  (Railway)      │
+│  (Vercel)       │ ←──────────────── │  (Render)       │
 │  React + Vite   │    JSON API       │  FastAPI        │
 └─────────────────┘                   └─────────────────┘
                                               │
@@ -29,18 +29,26 @@ This guide covers deploying both backend (Railway) and frontend (Vercel) for the
                                        └─────────────────┘
 ```
 
-## 🏗️ Step 1: Deploy Backend to Railway
+## 🏗️ Step 1: Deploy Backend to Render
 
-### 1.1 Create Railway Project
+### 1.1 Create Render Web Service
 
-1. Go to [Railway Dashboard](https://railway.app/dashboard)
-2. Click "New Project" → "Deploy from GitHub repo"
-3. Select your `AI-Powered-Note-Summarizer` repository
-4. Choose "Deploy Now"
+1. Go to [Render Dashboard](https://dashboard.render.com)
+2. Click "New" → "Web Service"
+3. Connect your GitHub repository
+4. Select your `AI-Powered-Note-Summarizer` repository
+5. Configure the service:
+   - **Name**: `ai-note-summarizer-backend`
+   - **Region**: Choose closest to your users
+   - **Branch**: `main`
+   - **Root Directory**: `backend`
+   - **Runtime**: `Python 3`
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `gunicorn app.main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT`
 
 ### 1.2 Configure Environment Variables
 
-In Railway project settings → Variables, add:
+In Render service settings → Environment, add:
 
 ```bash
 # Required
@@ -48,9 +56,8 @@ GROQ_API_KEY=your_groq_api_key_here
 
 # Server Configuration  
 DEBUG=False
-HOST=0.0.0.0
-PORT=8000
 ENVIRONMENT=production
+PYTHON_VERSION=3.12.0
 
 # CORS (will update after frontend deployment)
 ALLOWED_ORIGINS=*
@@ -58,19 +65,20 @@ ALLOWED_ORIGINS=*
 
 ### 1.3 Deploy Configuration
 
-Railway auto-detects these files:
-- `Procfile` → Start command
+Render auto-detects:
 - `requirements.txt` → Python dependencies
-- `railway.json` → Deploy configuration
+- Build and start commands from service settings
 
 ### 1.4 Verify Deployment
 
-1. Wait for build to complete
-2. Get your Railway URL: `https://[your-app].up.railway.app`
+1. Wait for build to complete (usually 5-10 minutes)
+2. Get your Render URL: `https://[your-service-name].onrender.com`
 3. Test endpoints:
    ```bash
-   curl https://[your-app].up.railway.app/health
+   curl https://[your-service-name].onrender.com/health
    ```
+
+> **Note**: Render free tier services spin down after inactivity. First request after inactivity may take 30-60 seconds to respond.
 
 ## 🌐 Step 2: Deploy Frontend to Vercel
 
@@ -94,10 +102,10 @@ Vercel should auto-detect, but verify:
 In Vercel project settings → Environment Variables:
 
 ```bash
-VITE_API_URL=https://[your-railway-app].up.railway.app
+VITE_API_URL=https://[your-render-service].onrender.com
 ```
 
-> Replace `[your-railway-app]` with your actual Railway URL
+> Replace `[your-render-service]` with your actual Render service name
 
 ### 2.4 Deploy
 
@@ -109,7 +117,7 @@ VITE_API_URL=https://[your-railway-app].up.railway.app
 
 ### 3.1 Update Backend CORS
 
-In Railway → Environment Variables, update:
+In Render service → Environment Variables, update:
 
 ```bash
 FRONTEND_URL=https://[your-vercel-app].vercel.app
@@ -118,7 +126,7 @@ ALLOWED_ORIGINS=https://[your-vercel-app].vercel.app,http://localhost:5173
 
 ### 3.2 Redeploy Backend
 
-Railway will automatically redeploy with new environment variables.
+Render will automatically redeploy when you update environment variables.
 
 ## ✅ Step 4: Final Testing
 
@@ -126,10 +134,10 @@ Railway will automatically redeploy with new environment variables.
 
 ```bash
 # Health check
-curl https://[your-railway-app].up.railway.app/health
+curl https://[your-render-service].onrender.com/health
 
 # Test summarization
-curl -X POST https://[your-railway-app].up.railway.app/summarize \
+curl -X POST https://[your-render-service].onrender.com/summarize \
   -H "Content-Type: application/json" \
   -d '{"text": "This is a test note to summarize. It should work properly with the AI service."}'
 ```
@@ -157,26 +165,25 @@ After successful deployment:
 | Service | URL | Purpose |
 |---------|-----|---------|
 | **Frontend** | `https://[your-app].vercel.app` | User interface |
-| **Backend** | `https://[your-app].up.railway.app` | API server |
-| **Health Check** | `https://[your-app].up.railway.app/health` | Service status |
-| **API Docs** | `https://[your-app].up.railway.app/docs` | FastAPI documentation |
+| **Backend** | `https://[your-service].onrender.com` | API server |
+| **Health Check** | `https://[your-service].onrender.com/health` | Service status |
+| **API Docs** | `https://[your-service].onrender.com/docs` | FastAPI documentation |
 
 ## 🔧 Environment Variables Summary
 
-### Backend (Railway)
+### Backend (Render)
 ```bash
 GROQ_API_KEY=gsk_...              # Your Groq API key
 DEBUG=False                        # Production mode
-HOST=0.0.0.0                      # Listen on all interfaces
-PORT=8000                         # Server port
 ENVIRONMENT=production            # Environment flag
+PYTHON_VERSION=3.12.0             # Python version
 ALLOWED_ORIGINS=https://...       # CORS origins
 FRONTEND_URL=https://...          # Frontend URL
 ```
 
 ### Frontend (Vercel)
 ```bash
-VITE_API_URL=https://[railway-url]  # Backend API URL
+VITE_API_URL=https://[render-service].onrender.com  # Backend API URL
 ```
 
 ## 🚨 Troubleshooting
@@ -186,15 +193,18 @@ VITE_API_URL=https://[railway-url]  # Backend API URL
 **Build Fails**
 - Check `requirements.txt` has all dependencies
 - Verify Python version compatibility (3.12+)
+- Check Render build logs for specific errors
 
 **Runtime Errors**
-- Check Railway logs: Project → Deployments → View Logs
-- Verify environment variables are set
+- Check Render service logs: Dashboard → Your Service → Logs
+- Verify environment variables are set correctly
 - Test Groq API key validity
+- **Cold Start Delay**: Render free tier spins down after inactivity - first request may take 30-60 seconds
 
 **CORS Errors**
 - Update `ALLOWED_ORIGINS` with correct frontend URL
 - Ensure no typos in URLs
+- Wait for automatic redeployment after env var changes
 
 ### Frontend Issues
 
@@ -206,6 +216,7 @@ VITE_API_URL=https://[railway-url]  # Backend API URL
 - Verify `VITE_API_URL` is set correctly
 - Check backend is deployed and healthy
 - Test API directly with curl
+- **Wait for cold start**: If service was inactive, first request may take time
 
 **Environment Variables Not Working**
 - Ensure variables start with `VITE_`
@@ -214,20 +225,26 @@ VITE_API_URL=https://[railway-url]  # Backend API URL
 
 ## 📊 Monitoring & Maintenance
 
-### Railway Monitoring
-- **Metrics**: CPU, Memory, Network usage
-- **Logs**: Real-time application logs
-- **Alerts**: Set up notifications for issues
+### Render Monitoring
+- **Service Metrics**: CPU, Memory, Response times
+- **Logs**: Real-time application and system logs
+- **Health Checks**: Automatic service monitoring
+- **Alerts**: Email notifications for service issues
 
 ### Vercel Monitoring
-- **Analytics**: Page views, performance
+- **Analytics**: Page views, performance metrics
 - **Function Logs**: Build and deployment logs
 - **Real User Metrics**: Core Web Vitals
 
 ### Cost Optimization
-- **Railway**: $5 free tier, pay-as-you-use
+- **Render**: Free tier with 750 hours/month, then $7/month for paid plan
 - **Vercel**: Generous free tier for personal projects
 - **Groq API**: Monitor usage and set limits
+
+### Performance Notes
+- **Render Free Tier**: Services sleep after 15 minutes of inactivity
+- **Cold Start**: First request after sleep takes 30-60 seconds
+- **Upgrade to Paid**: For always-on service and better performance
 
 ## 🔒 Security Considerations
 
@@ -244,11 +261,11 @@ Congratulations! Your AI-Powered Note Summarizer is now deployed and ready for u
 ### Share Your App
 - **Frontend**: `https://[your-app].vercel.app`
 - **Features**: AI-powered text summarization
-- **Tech Stack**: React + FastAPI + Groq AI
+- **Tech Stack**: React + FastAPI + Groq AI + Render
 - **No Authentication Required**: Perfect for quick text processing
 
 ---
 
 **Need Help?** Check the individual deployment guides:
-- [Backend Railway Guide](./backend/DEPLOYMENT_SIMPLE.md)
+- [Backend Render Guide](./backend/RENDER_DEPLOYMENT.md)
 - [Frontend Vercel Guide](./frontend/VERCEL_DEPLOYMENT.md)
