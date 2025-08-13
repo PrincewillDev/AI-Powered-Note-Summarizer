@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import './App.css'
 
 function App() {
   const [notes, setNotes] = useState('')
@@ -8,8 +9,6 @@ function App() {
 
   // API configuration
   const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
-  
-  console.log('API Base URL:', API_BASE_URL) // For debugging
 
   const handleSummarize = async () => {
     if (!notes.trim()) {
